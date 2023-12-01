@@ -186,7 +186,9 @@ def ranfil_ab(
     )
 
 
-def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False, cmap="coolwarm") -> Tuple[np.ndarray, np.ndarray]:
+def randfil_RM(
+    nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False, cmap="coolwarm"
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate random filamentary and Gaussian rotation measure maps with
     standard deviations defined by sigmaRM and power spectrum defined
@@ -199,7 +201,7 @@ def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False, cmap="coolwa
         sigmaRM (int, optional): Standard deviation. Defaults to 10.
         plot (bool, optional): Show plots. Defaults to False.
         cmap (str, optional): Colormap. Defaults to "coolwarm".
-    
+
     Returns:
         Tuple[np.ndarray, np.ndarray]: Gaussian and filamentary RM maps.
     """
