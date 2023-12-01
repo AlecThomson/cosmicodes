@@ -1,4 +1,9 @@
-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Power spectrum of random filamentary and Gaussian RM maps.
+"""
+__author__ = "Andrea Bracco"
 import numpy as np
 import pylab as plt
 import pywavan
@@ -6,7 +11,8 @@ import pywavan
 
 def powspec2D(im, im1, reso):
     """
-    Computes 2D angular power spectra between the input maps im and im1. nx and nz are the dimensions of the maps.
+    Computes 2D angular power spectra between the input maps im and im1.
+    nx and nz are the dimensions of the maps.
     """
 
     nx = np.shape(im)[0]
@@ -71,8 +77,8 @@ def compism(spec, nx, ny):
 
 def ranfil_ab(nax=256, spec=3, ndiri=13, plot=False):
     """
-    Generate a filamentary random field from input Gaussian field with power-law power spectrum k^(-spec).
-    Packages needed: standard astropy packages + pywavan (http://github.com/jfrob27/pywavan)
+    Generate a filamentary random field from input Gaussian field with
+    power-law power spectrum k^(-spec).
     """
     mran = compism(spec, nax, nax)
     wt, s11a, wavk, s1a, q = pywavan.fan_trans(
@@ -89,7 +95,7 @@ def ranfil_ab(nax=256, spec=3, ndiri=13, plot=False):
     k1, p1 = powspec2D((mfil), (mfil), 1)
     k0, p0 = powspec2D((mran), (mran), 1)
     pmod = (k0 + 1e-5) ** (-spec)
-    if plot == True:
+    if plot:
         plt.figure(1)
         plt.loglog(k1, p1 / np.percentile(p1, 99), label="filaments")
         plt.loglog(k0, p0 / np.percentile(p0, 99), label="random")
@@ -118,8 +124,9 @@ def ranfil_ab(nax=256, spec=3, ndiri=13, plot=False):
 
 def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False):
     """
-    Generate random filamentary and Gaussian rotation measure maps with standard deviations defined by sigmaRM and power spectrum defined by the spectral index spec.
-    Packages needed: standard astropy packages + pywavan (http://github.com/jfrob27/pywavan)
+    Generate random filamentary and Gaussian rotation measure maps with
+    standard deviations defined by sigmaRM and power spectrum defined
+    by the spectral index spec.
     """
 
     mRM_tmp = ranfil_ab(spec=spec, nax=nax)[1] - ranfil_ab(spec=spec, nax=nax)[1]
@@ -127,7 +134,7 @@ def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False):
     mRM_tmp_r = ranfil_ab(spec=spec, nax=nax)[0] - ranfil_ab(spec=spec, nax=nax)[0]
     mRM_r = mRM_tmp_r / np.std(mRM_tmp_r) * sigmaRM  # Gaussian RM
 
-    if plot == True:
+    if plot:
         plt.figure(figsize=[8, 8])
         plt.subplot(221)
         plt.imshow(mRM_r, cmap="seismic", origin="lower")
