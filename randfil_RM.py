@@ -1,14 +1,29 @@
+import numpy as np
+import astropy
+import pylab as plt
+from astropy.io import fits
+import matplotlib
+from matplotlib import cm
+import sys
+import numpy as np
+import pylab as plt
+from numpy.random import RandomState, SeedSequence
+from numpy.random import MT19937
+import numpy as np
+import pylab as plt
+import matplotlib
+import astropy
+import scipy
+from scipy import ndimage as nd
+from scipy import stats as st
+from scipy import constants as ko
+from scipy import signal
+import pywavan
+
 def powspec2D(im,im1,reso):
     '''
     Computes 2D angular power spectra between the input maps im and im1. nx and nz are the dimensions of the maps.
         '''
-    import numpy as np
-    import astropy
-    import pylab as plt
-    from astropy.io import fits
-    import matplotlib
-    from matplotlib import cm
-    import sys
     
     nx = np.shape(im)[0]
     nz = np.shape(im)[1]
@@ -45,10 +60,6 @@ def compism(spec,nx,ny):
         Packages needed: standard astropy packages.
         '''
 
-    import numpy as np
-    import pylab as plt
-    from numpy.random import RandomState, SeedSequence
-    from numpy.random import MT19937
 
     # Define the box size.
     x = np.linspace(0, nx-1, nx)
@@ -110,16 +121,7 @@ def randfil_RM(nax = 256, spec = 1.6, ndiri = 13, sigmaRM = 10, plot = False):
     Generate random filamentary and Gaussian rotation measure maps with standard deviations defined by sigmaRM and power spectrum defined by the spectral index spec.
     Packages needed: standard astropy packages + pywavan (http://github.com/jfrob27/pywavan)
         '''
-    import numpy as np
-    import pylab as plt
-    import matplotlib
-    import astropy
-    import scipy
-    from scipy import ndimage as nd
-    from scipy import stats as st
-    from scipy import constants as ko
-    from scipy import signal
-    import pywavan
+
     
     mRM_tmp = (ranfil_ab(spec= spec, nax=nax)[1] - ranfil_ab(spec= spec,nax=nax)[1])
     mRM_f = mRM_tmp/np.std(mRM_tmp)*sigmaRM #filamentary RM
