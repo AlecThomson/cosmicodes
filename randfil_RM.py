@@ -185,7 +185,7 @@ def ranfil_ab(
     )
 
 
-def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False):
+def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False, cmap="coolwarm"):
     """
     Generate random filamentary and Gaussian rotation measure maps with
     standard deviations defined by sigmaRM and power spectrum defined
@@ -206,7 +206,7 @@ def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False):
     if plot:
         plt.figure(figsize=[8, 8])
         plt.subplot(221)
-        plt.imshow(mRM_r, cmap="seismic", origin="lower")
+        plt.imshow(mRM_r, cmap=cmap, origin="lower")
         plt.colorbar()
         plt.title(r"Gaussian RM [rad m$^{-2}$]")
         plt.subplot(223)
@@ -216,7 +216,7 @@ def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False):
         plt.ylabel("histogram")
         plt.legend(fontsize=7)
         plt.subplot(222)
-        plt.imshow(mRM_f, cmap="seismic", origin="lower")
+        plt.imshow(mRM_f, cmap=cmap, origin="lower")
         plt.colorbar()
         plt.title(r"Filamentary RM [rad m$^{-2}$]")
         k3, p3 = powspec2D((mRM_f), (mRM_f), 1)
