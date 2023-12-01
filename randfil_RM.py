@@ -4,15 +4,22 @@
 Power spectrum of random filamentary and Gaussian RM maps.
 """
 __author__ = "Andrea Bracco"
+from typing import Tuple, NamedTuple
+
 import numpy as np
 import pylab as plt
 import pywavan
 
 
-def powspec2D(im, im1, reso):
-    """
-    Computes 2D angular power spectra between the input maps im and im1.
-    nx and nz are the dimensions of the maps.
+def powspec2D(im: np.ndarray, im1: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Computes 2D angular power spectra between the input maps im and im1.
+
+    Args:
+        im (np.ndarray): Map 1
+        im1 (np.ndarray): Map 2
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: k and power
     """
 
     nx = np.shape(im)[0]
@@ -20,7 +27,6 @@ def powspec2D(im, im1, reso):
 
     x = np.linspace(-1, 1, nx)
     z = np.linspace(-1, 1, nz)
-    xx, zz = np.meshgrid(x, z, indexing="ij")
     dk_x = 1.0 / (x[-1] - x[0])
     dk_z = 1.0 / (z[-1] - z[0])
     k_x = np.linspace(-nx / 2, nx / 2, nx)
@@ -44,18 +50,20 @@ def powspec2D(im, im1, reso):
     return k_shells, power
 
 
-def compism(spec, nx, ny):
-    """
-    Generate a Gaussian random field with power-law power spectrum k^(-spec).
-    Packages needed: standard astropy packages.
+def compism(spec: float, nx: int, ny: int) -> np.ndarray:
+    """Generate a Gaussian random field with power-law power spectrum k^(-spec).
+
+    Args:
+        spec (float): Spectral index
+        nx (int): Number of pixels in x
+        ny (int): Number of pixels in y
+
+    Returns:
+        np.ndarray: Random field image
     """
 
     # Define the box size.
     x = np.linspace(0, nx - 1, nx)
-    y = np.linspace(0, ny - 1, ny)
-    xx, yy = np.meshgrid(x, y, indexing="ij")
-    dx = x[1] - x[0]
-    dy = y[1] - y[0]
 
     # Generate a random afield (white noise).
     phase = np.random.random([nx, ny]) * 2 * np.pi
@@ -75,10 +83,65 @@ def compism(spec, nx, ny):
     return mout
 
 
-def ranfil_ab(nax=256, spec=3, ndiri=13, plot=False):
+class RandFilRM(NamedTuple):
     """
-    Generate a filamentary random field from input Gaussian field with
+    Random filamentary and Gaussian RM maps with power-law power
+    spectrum k^(-spec) and standard deviation sigmaRM.
+    """
+
+    mRM_r: np.ndarray
+    """
+    Gaussian RM map.
+    """
+    mRM_f: np.ndarray
+    """
+    Filamentary RM map.
+    """
+    k0: np.ndarray
+    """
+    Wavenumbers of Gaussian RM map.
+    """
+    p0: np.ndarray
+    """
+    Power spectrum of Gaussian RM map.
+    """
+    k1: np.ndarray
+    """
+    Wavenumbers of filamentary RM map.
+    """
+    p1: np.ndarray
+    """
+    Power spectrum of filamentary RM map.
+    """
+    res0: np.ndarray
+    """
+    Slope of Gaussian RM map.
+    """
+    res1: np.ndarray
+    """
+    Slope of filamentary RM map.
+    """
+
+
+def ranfil_ab(
+    nax: int = 256,
+    spec: float = 3.0,
+    ndiri: int = 13,
+    plot: bool = False,
+    cmap="coolwarm",
+) -> RandFilRM:
+    """Generate a filamentary random field from input Gaussian field with
     power-law power spectrum k^(-spec).
+
+    Args:
+        nax (int, optional): Box size. Defaults to 256.
+        spec (float, optional): Spectral index. Defaults to 3.0.
+        ndiri (int, optional): Number of directions to sample. Defaults to 13.
+        plot (bool, optional): Show plots. Defaults to False.
+        cmap (str, optional): Colormap. Defaults to "coolwarm".
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: Random field, filamentary field, power spectrum of random field, power spectrum of filamentary field, slope of random field, slope of filamentary field
     """
     mran = compism(spec, nax, nax)
     wt, s11a, wavk, s1a, q = pywavan.fan_trans(
@@ -104,21 +167,21 @@ def ranfil_ab(nax=256, spec=3, ndiri=13, plot=False):
         plt.legend()
         plt.figure(2)
         plt.subplot(121)
-        plt.imshow(mran, cmap="coolwarm")
+        plt.imshow(mran, cmap=cmap)
         plt.subplot(122)
-        plt.imshow(mfil, cmap="coolwarm")
+        plt.imshow(mfil, cmap=cmap)
         plt.tight_layout()
     res0 = np.polyfit(np.log10(k0[1 : len(k0) - 1]), np.log10(p0[1 : len(k0) - 1]), 1)
     res1 = np.polyfit(np.log10(k1[1 : len(k1) - 1]), np.log10(p1[1 : len(k1) - 1]), 1)
-    return (
-        mran,
-        mfil,
-        k0[1 : len(k0) - 1],
-        p0[1 : len(k0) - 1],
-        k1[1 : len(k1) - 1],
-        p1[1 : len(k1) - 1],
-        res0[0],
-        res1[0],
+    return RandFilRM(
+        mRM_r=mran,
+        mRM_f=mfil,
+        k0=k0[1 : len(k0) - 1],
+        p0=p0[1 : len(k0) - 1],
+        k1=k1[1 : len(k1) - 1],
+        p1=p1[1 : len(k1) - 1],
+        res0=res0[0],
+        res1=res1[0],
     )
 
 
@@ -129,9 +192,9 @@ def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False):
     by the spectral index spec.
     """
 
-    mRM_tmp = ranfil_ab(spec=spec, nax=nax)[1] - ranfil_ab(spec=spec, nax=nax)[1]
+    mRM_tmp = ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_f - ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_f
     mRM_f = mRM_tmp / np.std(mRM_tmp) * sigmaRM  # filamentary RM
-    mRM_tmp_r = ranfil_ab(spec=spec, nax=nax)[0] - ranfil_ab(spec=spec, nax=nax)[0]
+    mRM_tmp_r = ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_r - ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_r
     mRM_r = mRM_tmp_r / np.std(mRM_tmp_r) * sigmaRM  # Gaussian RM
 
     if plot:
