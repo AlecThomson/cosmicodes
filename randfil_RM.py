@@ -4,7 +4,7 @@
 Power spectrum of random filamentary and Gaussian RM maps.
 """
 __author__ = "Andrea Bracco"
-from typing import Tuple, NamedTuple
+from typing import NamedTuple, Tuple
 
 import numpy as np
 import pylab as plt
@@ -192,9 +192,15 @@ def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False):
     by the spectral index spec.
     """
 
-    mRM_tmp = ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_f - ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_f
+    mRM_tmp = (
+        ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_f
+        - ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_f
+    )
     mRM_f = mRM_tmp / np.std(mRM_tmp) * sigmaRM  # filamentary RM
-    mRM_tmp_r = ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_r - ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_r
+    mRM_tmp_r = (
+        ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_r
+        - ranfil_ab(spec=spec, ndiri=ndiri, nax=nax).mRM_r
+    )
     mRM_r = mRM_tmp_r / np.std(mRM_tmp_r) * sigmaRM  # Gaussian RM
 
     if plot:
