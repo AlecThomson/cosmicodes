@@ -141,7 +141,8 @@ def ranfil_ab(
         cmap (str, optional): Colormap. Defaults to "coolwarm".
 
     Returns:
-        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: Random field, filamentary field, power spectrum of random field, power spectrum of filamentary field, slope of random field, slope of filamentary field
+        RandFilRM: Random filamentary and Gaussian RM maps with power-law power
+        spectrum k^(-spec) and standard deviation sigmaRM.
     """
     mran = compism(spec, nax, nax)
     wt, s11a, wavk, s1a, q = pywavan.fan_trans(
@@ -155,8 +156,8 @@ def ranfil_ab(
         )
     sum0 = np.sum(prod, axis=0)
     mfil = np.log10(np.abs(sum0) / np.shape(wt)[1])
-    k1, p1 = powspec2D((mfil), (mfil), 1)
-    k0, p0 = powspec2D((mran), (mran), 1)
+    k1, p1 = powspec2D(mfil, mfil)
+    k0, p0 = powspec2D(mran, mran)
     pmod = (k0 + 1e-5) ** (-spec)
     if plot:
         plt.figure(1)
@@ -185,11 +186,22 @@ def ranfil_ab(
     )
 
 
-def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False, cmap="coolwarm"):
+def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False, cmap="coolwarm") -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate random filamentary and Gaussian rotation measure maps with
     standard deviations defined by sigmaRM and power spectrum defined
     by the spectral index spec.
+
+    Args:
+        nax (int, optional): Box size. Defaults to 256.
+        spec (float, optional): Spectral index. Defaults to 1.6.
+        ndiri (int, optional): Number of directions to sample. Defaults to 13.
+        sigmaRM (int, optional): Standard deviation. Defaults to 10.
+        plot (bool, optional): Show plots. Defaults to False.
+        cmap (str, optional): Colormap. Defaults to "coolwarm".
+    
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Gaussian and filamentary RM maps.
     """
 
     mRM_tmp = (
@@ -219,8 +231,8 @@ def randfil_RM(nax=256, spec=1.6, ndiri=13, sigmaRM=10, plot=False, cmap="coolwa
         plt.imshow(mRM_f, cmap=cmap, origin="lower")
         plt.colorbar()
         plt.title(r"Filamentary RM [rad m$^{-2}$]")
-        k3, p3 = powspec2D((mRM_f), (mRM_f), 1)
-        k2, p2 = powspec2D((mRM_r), (mRM_r), 1)
+        k3, p3 = powspec2D(mRM_f, mRM_f)
+        k2, p2 = powspec2D(mRM_r, mRM_r)
         pmod = 100 * (k3[1:]) ** (-spec)
         plt.subplot(224)
         plt.loglog(
