@@ -7,7 +7,7 @@ __author__ = "Andrea Bracco"
 from typing import NamedTuple, Tuple
 
 import numpy as np
-import pylab as plt
+import matplotlib.pyplot as plt
 import pywavan
 
 
